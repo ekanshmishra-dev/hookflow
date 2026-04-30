@@ -11,6 +11,7 @@ const WEBHOOK_SECRET = process.env.WEBHOOK_SECRET || 'super_secret_key';
 const processWebhook = async (job) => {
   const { eventId, eventType, payload, subscriberUrl } = job.data;
   const attemptCount = job.attemptsMade + 1;
+  console.log(`[Worker] Starting processing for event: ${eventId} (Attempt ${attemptCount}) to ${subscriberUrl}`);
 
   // 1. IDEMPOTENCY CHECK
   const processedKey = `processed:${eventId}`;
@@ -102,6 +103,7 @@ const processWebhook = async (job) => {
     await connection.del(processedKey);
 
     // Re-throw to trigger BullMQ retry logic
+    console.error(`[Worker] Delivery failed for event: ${eventId} - Error: ${errorMessage}`);
     throw error;
   }
 };
