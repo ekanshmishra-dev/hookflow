@@ -4,7 +4,7 @@ HookFlow is a production-ready webhook delivery system built with Node.js, Expre
 
 ## Features
 - **Idempotency**: Prevents duplicate processing of the same event using an `x-idempotency-key` header.
-- **Reliability**: Uses BullMQ for reliable queueing and background processing.
+- **Reliability**: Uses BullMQ for reliable queueing and background processing
 - **Retry Logic**: Automatically retries failed webhook deliveries up to 5 times with exponential backoff.
 - **Delivery Logging**: Stores the delivery status (`pending`, `success`, `failed`), retry counts, and payloads in MongoDB.
 - **Rate Limiting**: Protects your endpoints from abuse.
