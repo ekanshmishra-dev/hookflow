@@ -88,3 +88,13 @@ HookFlow uses [BullMQ](https://docs.bullmq.io/) under the hood. When the worker 
 - If the request times out or returns a non-2xx status, it throws an error and BullMQ automatically schedules a retry.
 - Retries use an **exponential backoff** strategy (e.g., 2s, 4s, 8s, 16s, etc.).
 - After 5 unsuccessful attempts, the job is marked as `failed` permanently in the database for manual review.
+
+## Future Roadmap
+- [ ] **Admin Dashboard**: A web interface to manage subscribers and view delivery metrics.
+- [ ] **Custom Retry Strategies**: Allow subscribers to define their own retry limits and backoff periods.
+- [ ] **Message Encryption**: Add support for encrypted payloads.
+- [ ] **GraphQL Support**: Support for GraphQL subscriptions.
+- [ ] **SDKs**: Official client libraries for Node.js, Python, and Go.
+
+## License
+Apache-2.0
