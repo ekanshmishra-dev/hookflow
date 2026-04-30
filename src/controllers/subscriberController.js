@@ -1,5 +1,12 @@
 const Subscriber = require('../models/Subscriber');
 
+/**
+ * Handles new subscriber registrations.
+ * Checks for existing subscriptions and creates a new one if it doesn't exist.
+ * 
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ */
 exports.subscribe = async (req, res) => {
   try {
     const { url, eventType } = req.body;
