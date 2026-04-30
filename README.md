@@ -9,12 +9,25 @@ HookFlow is a production-ready webhook delivery system built with Node.js, Expre
 - **Delivery Logging**: Stores the delivery status (`pending`, `success`, `failed`), retry counts, and payloads in MongoDB.
 - **Rate Limiting**: Protects your endpoints from abuse.
 
-## Prerequisites
-- **Node.js**: v14+
-- **MongoDB**: Running on default port `27017`
-- **Redis**: Running on default port `6379`
+## Getting Started 🚀
 
-## Setup Instructions
+Follow these steps to get HookFlow up and running on your local machine.
+
+### 1. Prerequisites
+Ensure you have the following installed:
+- [Node.js](https://nodejs.org/) (v14 or higher)
+- [MongoDB](https://www.mongodb.com/try/download/community) (running on port 27017)
+- [Redis](https://redis.io/download) (running on port 6379)
+
+### 2. Installation
+Clone the repository and install the dependencies:
+```bash
+git clone https://github.com/ekanshmishra-dev/hookflow.git
+cd hookflow
+npm install
+```
+
+### 3. Configuration
 
 1. **Clone/Download the repository**
 2. **Install Dependencies**
