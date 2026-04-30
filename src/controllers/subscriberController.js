@@ -1,5 +1,14 @@
 const Subscriber = require('../models/Subscriber');
 
+const isValidUrl = (url) => {
+  try {
+    new URL(url);
+    return true;
+  } catch (_) {
+    return false;
+  }
+};
+
 /**
  * Handles new subscriber registrations.
  * Checks for existing subscriptions and creates a new one if it doesn't exist.
@@ -13,6 +22,10 @@ exports.subscribe = async (req, res) => {
 
     if (!url || !eventType) {
       return res.status(400).json({ error: 'url and eventType are required' });
+    }
+
+    if (!isValidUrl(url)) {
+      return res.status(400).json({ error: 'Invalid URL format' });
     }
 
     // Try to find an existing subscription
