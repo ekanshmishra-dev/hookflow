@@ -1,5 +1,11 @@
 const EventLog = require('../models/EventLog');
 
+/**
+ * Retrieves delivery logs with support for pagination and filtering.
+ * 
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ */
 exports.getLogs = async (req, res) => {
   try {
     const limit = parseInt(req.query.limit, 10) || 50;
