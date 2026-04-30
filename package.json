@@ -1,7 +1,7 @@
 {
   "name": "hookflow",
   "version": "1.0.0",
-  "description": "",
+  "description": "A robust, production-ready webhook delivery system with retries and idempotency.",
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
@@ -9,9 +9,9 @@
     "start:worker": "node src/start-worker.js",
     "dev:worker": "nodemon src/start-worker.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": ["webhooks", "delivery", "bullmq", "redis", "idempotency"],
+  "author": "Ekansh Mishra",
+  "license": "Apache-2.0",
   "type": "commonjs",
   "dependencies": {
     "axios": "^1.15.2",
