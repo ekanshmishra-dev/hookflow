@@ -1,7 +1,10 @@
 const { Queue } = require('bullmq');
 const connection = require('./connection');
 
-// Initialize BullMQ queue for webhooks
+/**
+ * BullMQ Queue instance for managing webhook delivery jobs.
+ * Configured with exponential backoff and 3 retry attempts.
+ */
 const webhookQueue = new Queue('webhookQueue', { 
   connection,
   defaultJobOptions: {
