@@ -4,6 +4,12 @@ const Event = require('../models/Event');
 const EventLog = require('../models/EventLog');
 const webhookQueue = require('../queue/webhookQueue');
 
+/**
+ * Receives an incoming event and queues it for delivery to subscribers.
+ * 
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ */
 exports.receiveEvent = async (req, res) => {
   try {
     const { eventType, payload } = req.body;
@@ -97,6 +103,12 @@ exports.receiveEvent = async (req, res) => {
   }
 };
 
+/**
+ * Retrieves the delivery status and logs for a specific event.
+ * 
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ */
 exports.getEventStatus = async (req, res) => {
   try {
     const { eventId } = req.params;
@@ -128,6 +140,12 @@ exports.getEventStatus = async (req, res) => {
   }
 };
 
+/**
+ * Retrieves the list of failed deliveries from the Dead Letter Queue.
+ * 
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ */
 exports.getDeadLetterQueue = async (req, res) => {
   try {
     const connection = require('../queue/connection');
