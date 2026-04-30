@@ -9,4 +9,16 @@ const redisOptions = {
 
 const connection = new Redis(redisOptions);
 
+connection.on('connect', () => {
+  console.log('[Redis] Connected to server');
+});
+
+connection.on('error', (err) => {
+  console.error('[Redis] Connection error:', err.message);
+});
+
+connection.on('close', () => {
+  console.warn('[Redis] Connection closed');
+});
+
 module.exports = connection;
