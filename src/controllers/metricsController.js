@@ -15,10 +15,19 @@ exports.getMetrics = async (req, res) => {
     // Queue stats
     const jobCounts = await webhookQueue.getJobCounts('wait', 'active', 'completed', 'failed', 'delayed');
 
+    const mem = process.memoryUsage();
+    const formattedMemory = {
+      rss: `${(mem.rss / 1024 / 1024).toFixed(2)} MB`,
+      heapTotal: `${(mem.heapTotal / 1024 / 1024).toFixed(2)} MB`,
+      heapUsed: `${(mem.heapUsed / 1024 / 1024).toFixed(2)} MB`
+    };
+
     return res.status(200).json({
+      status: 'operational',
+      timestamp: new Date().toISOString(),
       system: {
-        uptime: process.uptime(),
-        memoryUsage: process.memoryUsage()
+        uptime: `${Math.floor(process.uptime())} seconds`,
+        memoryUsage: formattedMemory
       },
       database: {
         totalEvents,
