@@ -21,6 +21,10 @@ exports.receiveEvent = async (req, res) => {
       return res.status(400).json({ error: 'eventType and payload are required' });
     }
 
+    if (typeof payload !== 'object' || Object.keys(payload).length === 0) {
+      return res.status(400).json({ error: 'payload must be a non-empty object' });
+    }
+
     // Check idempotency if key provided
     if (idempotencyKey) {
       const existingEvent = await Event.findOne({ idempotencyKey });
