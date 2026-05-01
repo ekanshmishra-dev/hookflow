@@ -9,7 +9,13 @@
     "start:worker": "node src/start-worker.js",
     "dev:worker": "nodemon src/start-worker.js"
   },
-  "keywords": ["webhooks", "delivery", "bullmq", "redis", "idempotency"],
+  "keywords": [
+    "webhooks",
+    "delivery",
+    "bullmq",
+    "redis",
+    "idempotency"
+  ],
   "author": "Ekansh Mishra",
   "license": "Apache-2.0",
   "type": "commonjs",
@@ -21,7 +27,8 @@
     "express-rate-limit": "^8.4.1",
     "ioredis": "^5.10.1",
     "mongoose": "^9.6.0",
-    "uuid": "^14.0.0"
+    "uuid": "^14.0.0",
+    "winston": "^3.19.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.14"

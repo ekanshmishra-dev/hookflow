@@ -6,18 +6,25 @@ const eventLogSchema = new mongoose.Schema({
     required: true,
     index: true
   },
+  subscriberId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Subscriber',
+    required: true,
+    index: true
+  },
   url: {
     type: String,
-    required: true
+    required: false
   },
   status: {
     type: String,
-    enum: ['success', 'failed'],
+    enum: ['pending', 'success', 'failed'],
+    default: 'pending',
     required: true
   },
   attempts: {
     type: Number,
-    default: 1
+    default: 0
   },
   responseCode: {
     type: Number

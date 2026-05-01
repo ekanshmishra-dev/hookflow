@@ -1,113 +1,70 @@
-# HookFlow 🚀
+# HookFlow – Scalable Webhook Delivery System
 
-HookFlow is a production-ready webhook delivery system built with Node.js, Express, MongoDB, Redis, and BullMQ. It allows you to reliably receive events and broadcast them to registered subscribers with automatic retries and exponential backoff.
+HookFlow is a production-ready, high-performance webhook delivery engine built with Node.js, MongoDB, and Redis. It handles millions of events with parallel delivery, exponential backoff retries, and secure HMAC signing.
 
-## Features
-- **Idempotency**: Prevents duplicate processing of the same event using an `x-idempotency-key` header.
-- **Reliability**: Uses BullMQ for reliable queueing and background processing.
-- **Retry Logic**: Automatically retries failed webhook deliveries up to 5 times with exponential backoff.
-- **Delivery Logging**: Stores the delivery status (`pending`, `success`, `failed`), retry counts, and payloads in MongoDB.
-- **Rate Limiting**: Protects your endpoints from abuse.
+## 🚀 Features
 
-## Getting Started 🚀
+- **Parallel Delivery**: High-throughput webhook fan-out using `Promise.all`.
+- **Reliability**: Exponential backoff (5 attempts) with BullMQ.
+- **Security**: SHA256 HMAC signatures for each delivery.
+- **Idempotency**: Prevents duplicate event processing via `x-idempotency-key`.
+- **DLQ**: Dead Letter Queue for tracking and re-processing permanent failures.
+- **Observability**: Centralized Winston logging and `/metrics` API.
+- **Production Ready**: Configured for Render, MongoDB Atlas, and Upstash.
 
-Follow these steps to get HookFlow up and running on your local machine.
+## 🏗 Architecture
 
-### 1. Prerequisites
-Ensure you have the following installed:
-- [Node.js](https://nodejs.org/) (v14 or higher)
-- [MongoDB](https://www.mongodb.com/try/download/community) (running on port 27017)
-- [Redis](https://redis.io/download) (running on port 6379)
+HookFlow uses a **Producer-Consumer** architecture:
+1. **API (Producer)**: Receives events and queues them in Redis.
+2. **Worker (Consumer)**: Picks up jobs, fetches subscribers, signs payloads, and delivers them in parallel.
+3. **Storage**: MongoDB stores event logs, subscription metadata, and event history.
 
-### 2. Installation
-Clone the repository and install the dependencies:
-```bash
-git clone https://github.com/ekanshmishra-dev/hookflow.git
-cd hookflow
-npm install
-```
+## 🛠 Tech Stack
 
-### 3. Configuration
+- **Runtime**: Node.js (Express)
+- **Database**: MongoDB (Mongoose)
+- **Queue/Cache**: Redis (BullMQ)
+- **Logging**: Winston
+- **HTTP Client**: Axios (with 5s timeouts)
 
-1. **Clone/Download the repository**
-2. **Install Dependencies**
+## 🚦 API Endpoints
+
+### Subscribers
+- `POST /api/subscribers`: Register a new webhook listener.
+  - Body: `{ "url": "https://callback.com", "eventType": "user.created" }`
+
+### Events
+- `POST /api/events`: Trigger a new event.
+  - Headers: `x-idempotency-key: unique-uuid`
+  - Body: `{ "eventType": "user.created", "payload": { "id": 123 } }`
+- `GET /api/events/:eventId`: Track delivery status per subscriber.
+
+### Monitoring
+- `GET /api/metrics`: Real-time system health and success rates.
+- `GET /api/dlq`: View failed deliveries in the Dead Letter Queue.
+
+## 📦 Setup Instructions
+
+1. **Clone & Install**:
    ```bash
+   git clone https://github.com/your-repo/hookflow.git
    npm install
    ```
-3. **Environment Setup**
-   Copy `.env.example` to `.env` and adjust the variables if your MongoDB or Redis instances are hosted remotely:
-   ```bash
-   cp .env.example .env
-   ```
-4. **Start the Database & Redis**
-   Ensure your local MongoDB server and Redis server are running.
+2. **Environment**:
+   - Copy `.env.example` to `.env`.
+   - Update `MONGODB_URI` and `REDIS` credentials.
+3. **Run**:
+   - Start Server: `npm start`
+   - Start Worker: `npm run worker`
 
-5. **Start the API Server**
-   ```bash
-   npm start
-   # Or for development with auto-restart:
-   npm run dev
-   ```
+## 🔐 HMAC Verification (Example)
 
-6. **Start the Background Worker** (in a separate terminal)
-   ```bash
-   npm run start:worker
-   # Or for development:
-   npm run dev:worker
-   ```
+Subscribers can verify authenticity using the `x-webhook-signature` header:
+```javascript
+const crypto = require('crypto');
+const hmac = crypto.createHmac('sha256', SECRET).update(JSON.stringify(payload)).digest('hex');
+const isValid = (hmac === receivedSignature);
+```
 
-## API Endpoints
-
-### 1. Register a Subscriber
-Registers a URL to listen for a specific event type.
-- **Method**: `POST /api/subscribe`
-- **Body**:
-  ```json
-  {
-    "url": "https://webhook.site/your-unique-id",
-    "eventType": "user.created"
-  }
-  ```
-
-### 2. Publish an Event
-Sends an event to the system. HookFlow will queue it and push it to all relevant subscribers.
-- **Method**: `POST /api/events`
-- **Headers**: 
-  - `x-idempotency-key`: `some-unique-string` (Optional, but highly recommended to prevent duplicate processing)
-- **Body**:
-  ```json
-  {
-    "eventType": "user.created",
-    "payload": {
-      "id": 123,
-      "email": "test@example.com",
-      "name": "John Doe"
-    }
-  }
-  ```
-
-### 3. View Event Logs
-View the status of processed events (Bonus Feature).
-- **Method**: `GET /api/logs`
-- **Query Params**:
-  - `limit`: number (default: 50)
-  - `page`: number (default: 1)
-  - `status`: string (e.g., "success", "failed", "pending")
-  - `eventId`: string
-
-## How Retry Works
-HookFlow uses [BullMQ](https://docs.bullmq.io/) under the hood. When the worker picks up a job, it attempts to send an HTTP POST request to the subscriber's URL.
-- If the request returns a 2xx status, it's marked as `success` in the database.
-- If the request times out or returns a non-2xx status, it throws an error and BullMQ automatically schedules a retry.
-- Retries use an **exponential backoff** strategy (e.g., 2s, 4s, 8s, 16s, etc.).
-- After 5 unsuccessful attempts, the job is marked as `failed` permanently in the database for manual review.
-
-## Future Roadmap
-- [ ] **Admin Dashboard**: A web interface to manage subscribers and view delivery metrics.
-- [ ] **Custom Retry Strategies**: Allow subscribers to define their own retry limits and backoff periods.
-- [ ] **Message Encryption**: Add support for encrypted payloads.
-- [ ] **GraphQL Support**: Support for GraphQL subscriptions.
-- [ ] **SDKs**: Official client libraries for Node.js, Python, and Go.
-
-## License
-Apache-2.0
+---
+Built for scale and reliability.

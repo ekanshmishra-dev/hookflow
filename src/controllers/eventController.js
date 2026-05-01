@@ -3,18 +3,17 @@ const Subscriber = require('../models/Subscriber');
 const Event = require('../models/Event');
 const EventLog = require('../models/EventLog');
 const webhookQueue = require('../queue/webhookQueue');
+const logger = require('../utils/logger');
+const connection = require('../queue/connection');
 
 /**
- * Receives an incoming event and queues it for delivery to subscribers.
- * 
- * @param {Object} req - Express request object
- * @param {Object} res - Express response object
+ * HookFlow Controller: Handles event ingestion and delivery status.
  */
+
+// POST /api/events
 exports.receiveEvent = async (req, res) => {
   try {
     const { eventType, payload } = req.body;
-    
-    // Optional duplicate prevention via header
     const idempotencyKey = req.headers['x-idempotency-key'];
 
     if (!eventType || !payload) {
@@ -25,7 +24,6 @@ exports.receiveEvent = async (req, res) => {
       return res.status(400).json({ error: 'payload must be a non-empty object' });
     }
 
-    // Check idempotency if key provided
     if (idempotencyKey) {
       const existingEvent = await Event.findOne({ idempotencyKey });
       if (existingEvent) {
@@ -36,10 +34,7 @@ exports.receiveEvent = async (req, res) => {
       }
     }
 
-    // Generate internal unique event ID
     const eventId = uuidv4();
-
-    // Create main Event record
     const newEvent = new Event({
       eventId,
       idempotencyKey,
@@ -47,79 +42,31 @@ exports.receiveEvent = async (req, res) => {
       payload
     });
 
-    // Find all subscribers for this event type
-    const subscribers = await Subscriber.find({ eventType });
-
-    if (subscribers.length === 0) {
-      await newEvent.save();
-      return res.status(200).json({ 
-        message: 'Event accepted',
-        eventId
-      });
-    }
-
-    // Process event for all subscribers
-    const jobs = [];
-    const eventLogs = [];
-
-    for (const sub of subscribers) {
-      // Create a pending event log for each subscriber
-      const log = new EventLog({
-        eventId,
-        eventType,
-        payload,
-        status: 'pending',
-        subscriberUrl: sub.url
-      });
-      eventLogs.push(log);
-
-      // Add to BullMQ queue
-      jobs.push({
-        name: 'webhook',
-        data: {
-          eventId,
-          eventType,
-          payload,
-          subscriberUrl: sub.url
-        }
-      });
-    }
-
-    // Save main event, then all logs
     await newEvent.save();
-    await EventLog.insertMany(eventLogs);
 
-    // Push all jobs to queue
-    await webhookQueue.addBulk(jobs);
+    await webhookQueue.add('process-event', {
+      eventId,
+      eventType,
+      payload
+    });
 
     return res.status(202).json({
       message: 'Event accepted',
-      eventId,
-      queuedDeliveries: jobs.length
+      eventId
     });
 
   } catch (error) {
-    if (error.code === 11000) {
-      return res.status(200).json({ error: 'Event already processed (idempotency conflict)' });
-    }
-    console.error('[Event Controller] Error:', error);
+    logger.error('Error in receiveEvent', { error: error.message, body: req.body });
     return res.status(500).json({ error: 'Internal server error' });
   }
 };
 
-/**
- * Retrieves the delivery status and logs for a specific event.
- * 
- * @param {Object} req - Express request object
- * @param {Object} res - Express response object
- */
+// GET /api/events/:eventId
 exports.getEventStatus = async (req, res) => {
   try {
     const { eventId } = req.params;
-
     const logs = await EventLog.find({ eventId }).sort({ deliveredAt: -1 });
     
-    // Compute status from logs
     let status = 'pending';
     if (logs.length > 0) {
       const hasSuccess = logs.some(l => l.status === 'success');
@@ -129,7 +76,7 @@ exports.getEventStatus = async (req, res) => {
     return res.status(200).json({
       eventId,
       status,
-      attempts: logs.length,
+      deliveries: logs.length,
       logs: logs.map(l => ({
         url: l.url,
         status: l.status,
@@ -139,20 +86,14 @@ exports.getEventStatus = async (req, res) => {
       }))
     });
   } catch (error) {
-    console.error('[Event Controller] getEventStatus Error:', error);
+    logger.error('Error in getEventStatus', { error: error.message, eventId: req.params.eventId });
     return res.status(500).json({ error: 'Internal server error' });
   }
 };
 
-/**
- * Retrieves the list of failed deliveries from the Dead Letter Queue.
- * 
- * @param {Object} req - Express request object
- * @param {Object} res - Express response object
- */
+// GET /api/dlq
 exports.getDeadLetterQueue = async (req, res) => {
   try {
-    const connection = require('../queue/connection');
     const failedJobs = await connection.lrange('deadLetterQueue', 0, -1);
     const parsedJobs = failedJobs.map(job => JSON.parse(job));
 
@@ -161,7 +102,7 @@ exports.getDeadLetterQueue = async (req, res) => {
       jobs: parsedJobs
     });
   } catch (error) {
-    console.error('[Event Controller] getDeadLetterQueue Error:', error);
+    logger.error('Error in getDeadLetterQueue', { error: error.message });
     return res.status(500).json({ error: 'Internal server error' });
   }
 };

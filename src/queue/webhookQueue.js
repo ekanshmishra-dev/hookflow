@@ -3,15 +3,15 @@ const connection = require('./connection');
 
 /**
  * BullMQ Queue instance for managing webhook delivery jobs.
- * Configured with exponential backoff and 3 retry attempts.
+ * Configured with exponential backoff and 5 retry attempts.
  */
 const webhookQueue = new Queue('webhookQueue', { 
   connection,
   defaultJobOptions: {
-    attempts: 3,
+    attempts: 5,
     backoff: {
       type: 'exponential',
-      delay: 1000 // 1s, 2s, 4s
+      delay: 5000 // 5s, 10s, 20s, 40s, 80s
     },
     removeOnComplete: true,
     removeOnFail: false // keep failed jobs in BullMQ to handle 'failed' event

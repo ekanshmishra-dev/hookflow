@@ -1,4 +1,9 @@
 const Subscriber = require('../models/Subscriber');
+const logger = require('../utils/logger');
+
+/**
+ * HookFlow Subscriber Controller
+ */
 
 const isValidUrl = (url) => {
   try {
@@ -9,13 +14,7 @@ const isValidUrl = (url) => {
   }
 };
 
-/**
- * Handles new subscriber registrations.
- * Checks for existing subscriptions and creates a new one if it doesn't exist.
- * 
- * @param {Object} req - Express request object
- * @param {Object} res - Express response object
- */
+// POST /api/subscribers
 exports.subscribe = async (req, res) => {
   try {
     const { url, eventType } = req.body;
@@ -28,7 +27,6 @@ exports.subscribe = async (req, res) => {
       return res.status(400).json({ error: 'Invalid URL format' });
     }
 
-    // Try to find an existing subscription
     let subscriber = await Subscriber.findOne({ url, eventType });
 
     if (subscriber) {
@@ -38,19 +36,21 @@ exports.subscribe = async (req, res) => {
       });
     }
 
-    // Create a new subscription
     subscriber = new Subscriber({ url, eventType });
     await subscriber.save();
+
+    logger.info('New subscription created', { url, eventType });
 
     return res.status(201).json({
       message: 'Successfully subscribed',
       subscriber
     });
+
   } catch (error) {
     if (error.code === 11000) {
       return res.status(200).json({ error: 'Already subscribed' });
     }
-    console.error('[Subscriber Controller] Error:', error);
+    logger.error('Error in subscriber registration', { error: error.message, body: req.body });
     return res.status(500).json({ error: 'Internal server error' });
   }
 };
