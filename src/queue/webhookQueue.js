@@ -14,7 +14,7 @@ const webhookQueue = new Queue('webhookQueue', {
       delay: 5000 // 5s, 10s, 20s, 40s, 80s
     },
     removeOnComplete: true,
-    removeOnFail: false // keep failed jobs in BullMQ to handle 'failed' event
+    removeOnFail: false // keep failed jobs in BullMQ to handle 'failed' event and metrics tracking
   }
 });
 
