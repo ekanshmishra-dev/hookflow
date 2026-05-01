@@ -30,6 +30,7 @@ exports.subscribe = async (req, res) => {
     let subscriber = await Subscriber.findOne({ url, eventType });
 
     if (subscriber) {
+      logger.debug('Subscriber already exists', { url, eventType });
       return res.status(200).json({ 
         message: 'Already subscribed',
         subscriber 
