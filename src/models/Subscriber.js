@@ -1,5 +1,10 @@
 const mongoose = require('mongoose');
 
+/**
+ * @typedef {Object} Subscriber
+ * @property {string} url - The callback URL for the webhook
+ * @property {string} eventType - The type of event the subscriber is interested in
+ */
 const subscriberSchema = new mongoose.Schema({
   url: {
     type: String,
