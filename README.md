@@ -47,15 +47,24 @@ HookFlow uses a **Producer-Consumer** architecture:
 
 1. **Clone & Install**:
    ```bash
-   git clone https://github.com/your-repo/hookflow.git
+   git clone https://github.com/ekanshmishra-dev/hookflow.git
+   cd hookflow
    npm install
    ```
-2. **Environment**:
+2. **Environment Configuration**:
    - Copy `.env.example` to `.env`.
-   - Update `MONGODB_URI` and `REDIS` credentials.
-3. **Run**:
-   - Start Server: `npm start`
-   - Start Worker: `npm run worker`
+   - Update `MONGODB_URI` and `REDIS_URL` credentials.
+3. **Execution**:
+   - Start API Server: `npm start`
+   - Start Background Worker: `npm run worker`
+
+### 🐳 Docker (Optional)
+```bash
+docker-compose up -d
+```
+
+## 🤝 Contributing
+Contributions are welcome! Please open an issue or submit a pull request for any improvements or bug fixes.
 
 ## 🔐 HMAC Verification (Example)
 
