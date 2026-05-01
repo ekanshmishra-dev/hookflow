@@ -1,4 +1,5 @@
 const EventLog = require('../models/EventLog');
+const logger = require('../utils/logger');
 
 /**
  * Retrieves delivery logs with support for pagination and filtering.
@@ -31,7 +32,7 @@ exports.getLogs = async (req, res) => {
       logs
     });
   } catch (error) {
-    console.error('[Log Controller] Error:', error);
+    logger.error('Error retrieving delivery logs', { error: error.message, query: req.query });
     return res.status(500).json({ error: 'Internal server error' });
   }
 };
