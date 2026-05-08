@@ -87,3 +87,5 @@ module.exports = app;
 // Contribution update #24 - 2026-05-02 22:11:12
 
 // Contribution update #25 - 2026-05-02 22:11:12
+
+// App configuration and middleware setup
