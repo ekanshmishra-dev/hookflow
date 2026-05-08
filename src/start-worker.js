@@ -20,3 +20,5 @@ async function startWorker() {
 }
 
 startWorker();
+
+// Script to start the background worker
