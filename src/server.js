@@ -24,3 +24,5 @@ async function startServer() {
 }
 
 startServer();
+
+// Entry point for the application
