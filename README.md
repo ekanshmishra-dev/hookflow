@@ -77,3 +77,5 @@ const isValid = (hmac === receivedSignature);
 
 ---
 Built for scale and reliability.
+
+<!-- Project status: Active -->
