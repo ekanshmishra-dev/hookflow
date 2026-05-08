@@ -52,3 +52,5 @@ const eventLogSchema = new mongoose.Schema({
 });
 
 module.exports = mongoose.model('EventLog', eventLogSchema);
+
+// Schema for event logs
