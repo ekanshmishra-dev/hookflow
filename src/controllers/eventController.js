@@ -106,3 +106,5 @@ exports.getDeadLetterQueue = async (req, res) => {
     return res.status(500).json({ error: 'Internal server error' });
   }
 };
+
+// Controller for handling event routes
