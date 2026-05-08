@@ -33,3 +33,5 @@ connection.on('close', () => {
 });
 
 module.exports = connection;
+
+// Redis connection setup for queue
