@@ -24,3 +24,5 @@ router.get('/dead', eventController.getDeadLetterQueue);
 router.get('/logs', logController.getLogs);
 
 module.exports = router;
+
+// Main application router
