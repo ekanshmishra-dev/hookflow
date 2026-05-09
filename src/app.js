@@ -52,7 +52,8 @@ app.get('/', (req, res) => {
                 justify-content: center;
                 align-items: center;
                 min-height: 100vh;
-                overflow: hidden;
+                overflow-y: auto;
+                padding: 2rem 0;
             }
             .bg-glow {
                 position: absolute;
@@ -74,9 +75,10 @@ app.get('/', (req, res) => {
                 border-radius: 24px;
                 padding: 3rem;
                 width: 90%;
-                max-width: 600px;
+                max-width: 650px;
                 text-align: center;
                 box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+                margin: auto;
             }
             .container::before {
                 content: '';
@@ -107,7 +109,7 @@ app.get('/', (req, res) => {
                 display: grid;
                 grid-template-columns: repeat(3, 1fr);
                 gap: 1rem;
-                margin-bottom: 2.5rem;
+                margin-bottom: 2rem;
             }
             .status-item {
                 background: rgba(0, 0, 0, 0.2);
@@ -147,45 +149,62 @@ app.get('/', (req, res) => {
                 50% { transform: scale(1.2); opacity: 0.7; }
                 100% { transform: scale(1); opacity: 1; }
             }
-            .features {
+            .section-box {
                 text-align: left;
                 background: rgba(0, 0, 0, 0.2);
                 padding: 1.5rem;
                 border-radius: 16px;
                 border: 1px solid var(--border);
+                margin-bottom: 1.5rem;
             }
-            .features h3 {
+            .section-box h3 {
                 font-family: 'Orbitron', sans-serif;
                 font-size: 1rem;
                 margin-top: 0;
                 margin-bottom: 1rem;
                 color: var(--primary);
             }
-            .features ul {
+            .section-box ul {
                 list-style: none;
                 padding: 0;
                 margin: 0;
             }
-            .features li {
+            .section-box li {
                 margin-bottom: 0.75rem;
                 font-size: 0.9rem;
                 color: #aaa;
                 display: flex;
                 align-items: center;
             }
-            .features li::before {
+            .section-box.features li::before {
                 content: '⚡';
                 margin-right: 10px;
                 color: var(--primary);
             }
-            .footer {
-                margin-top: 2.5rem;
-                font-size: 0.8rem;
-                color: #444;
+            .section-box.docs code {
+                background: rgba(255, 255, 255, 0.05);
+                padding: 2px 6px;
+                border-radius: 4px;
+                font-family: monospace;
+                font-size: 0.85rem;
+                margin-right: 8px;
+            }
+            .method {
+                font-weight: bold;
+                width: 50px;
+                display: inline-block;
+            }
+            .method.get { color: var(--primary); }
+            .method.post { color: #ffaa00; }
+            
+            .btn-group {
+                display: flex;
+                gap: 1rem;
+                justify-content: center;
+                margin-top: 1.5rem;
             }
             .btn {
                 display: inline-block;
-                margin-top: 1.5rem;
                 padding: 0.75rem 1.5rem;
                 background: transparent;
                 border: 1px solid var(--primary);
@@ -201,6 +220,11 @@ app.get('/', (req, res) => {
                 background: var(--primary);
                 color: #000;
                 box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
+            }
+            .footer {
+                margin-top: 2.5rem;
+                font-size: 0.8rem;
+                color: #444;
             }
         </style>
     </head>
@@ -225,7 +249,7 @@ app.get('/', (req, res) => {
                 </div>
             </div>
 
-            <div class="features">
+            <div class="section-box features">
                 <h3>System Architecture</h3>
                 <ul>
                     <li>Parallel Delivery with Concurrent Workers</li>
@@ -235,7 +259,22 @@ app.get('/', (req, res) => {
                 </ul>
             </div>
 
-            <a href="/health" class="btn">Check Health JSON</a>
+            <div class="section-box docs">
+                <h3>API Endpoints</h3>
+                <ul>
+                    <li><span class="method get">GET</span><code>/api/health</code> - System Health Check</li>
+                    <li><span class="method get">GET</span><code>/api/metrics</code> - System Metrics</li>
+                    <li><span class="method post">POST</span><code>/api/subscribers</code> - Register Subscriber</li>
+                    <li><span class="method post">POST</span><code>/api/events</code> - Trigger Event</li>
+                    <li><span class="method get">GET</span><code>/api/events/:id</code> - Event Status</li>
+                    <li><span class="method get">GET</span><code>/api/logs</code> - Delivery Logs</li>
+                </ul>
+            </div>
+
+            <div class="btn-group">
+                <a href="/health" class="btn">Check Health</a>
+                <a href="/api/metrics" class="btn">Check Metrics</a>
+            </div>
 
             <div class="footer">
                 Developed by Ekansh Mishra | For Evaluation Only
